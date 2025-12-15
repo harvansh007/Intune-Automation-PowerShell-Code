@@ -1,0 +1,65 @@
+#==================================================  Add Device to The Group ======================================
+
+   function Adddevice
+   
+   {
+        
+        if((Get-MgContext).Account -eq $null )
+            {Write-Host "You have not logged in, Please click on Connect to login in Intune/Entra" }
+            Else {
+            $groupnames = "Adobe Reader"
+            $ComputerName = Get-Content -Path "D:\Automation\ComputerList.txt"
+
+            if(($ComputerName -eq "") -or ($Groupname -eq ""))
+                {[Windows.Forms.MessageBox]::Show("Please enter Computer Name and Group Name")}
+               
+                    else {
+          #========================  Group ID ===========================
+                        
+                        $Groups =  Get-MgGroup -Filter "DisplayName eq '$($Groupnames)'" | Select-Object id, displayName
+
+                            if(!($Groups.displayName -eq $groupnames))
+                                        
+                                     {Write-Host "$($Groupnames) : Group is not found in Intune/Entra" }
+
+                                        
+          
+                                 #========================= To Collect Device ID from the List =====================
+                                      else {
+
+                                                Write-Host "========== Collecting Device IDs =============" 
+                                                $Groupid = $Groups.Id
+                      
+                                                $Deviceid = @()
+                                                   foreach($Computers in $ComputerName)
+                                                            {  
+                                                       
+                                                        $DevceIDs = Get-MgDevice -Filter "displayName eq '$($Computers)'" | select Id, DisplayName
+                                                        $Deviceid += $DevceIDs.id
+
+                                                            }
+                                                
+                                                $GroupMemberid = (Get-MgGroupMember -GroupId $groupid).id
+                                              
+                                                Write-Host "========== Adding Devices to Group ========"
+
+                                                foreach ($deviceids in $Deviceid)
+                                              {
+                                                    if ($deviceids -in $GroupMemberid)
+
+                                                    {Write-Host "$((Get-MgDevice -Filter "ID eq '$($deviceids)'").DisplayName) : Already in Group"}
+
+                                                    else {
+                                                     $addbody = @{"@odata.id"= "https://graph.microsoft.com/v1.0/directoryObjects/$deviceids"}
+                                                     New-MgGroupMemberByRef -GroupId $groupId -BodyParameter $addbody
+                                                     Write-Host "$((Get-MgDevice -Filter "ID eq '$($deviceids)'").DisplayName) : Added to Group"
+                                                     }
+                         
+                                                     }
+                                            }
+                                    }
+                                    }
+                                }
+
+Adddevice
+                        
