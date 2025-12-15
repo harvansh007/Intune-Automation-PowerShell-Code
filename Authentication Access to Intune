@@ -1,0 +1,35 @@
+ Function Connect {
+                         
+$graph = Connect-MgGraph -ErrorVariable MyError
+
+if ($graph -match "Welcome to Microsoft Graph!" )
+    
+    { 
+    
+    Write-Host "Welcome to Microsoft Intune"
+
+    }
+
+else { 
+
+ Write-Host $MyError
+ 
+ }
+
+
+        $upn = (Get-MgContext).Account
+        $Userid = (Get-MgUser -ConsistencyLevel eventual -Count userCount  -Search  UserPrincipalName:$((Get-MgContext).Account)).Id
+        $MemberOf = (Get-MgUserMemberOf -UserId $Userid | Select-Object *).AdditionalProperties.displayName   
+    
+        
+        if(($MemberOf  -eq "Intune Administrator") -or  ($MemberOf  -eq "Global Administrator"))
+        {
+        Write-Host "You have logged in with $((Get-MgContext).Account) account and you have sufficient Permission to Add/Remove Device"
+        }
+        else {
+        Write-Host "You have logged in with $((Get-MgContext).Account), Sorry you do not have sufficient Permission to Add/Remove Devices, Please check if you have Intune or Global Administrator permissions on your account"
+        }
+
+
+ }
+ Connect
