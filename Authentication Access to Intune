@@ -1,4 +1,5 @@
- Function Connect {
+# This script is used to connect with MS Graph 
+Function Connect {
                          
 $graph = Connect-MgGraph -ErrorVariable MyError
 
@@ -15,9 +16,7 @@ else {
  Write-Host $MyError
  
  }
-
-
-        $upn = (Get-MgContext).Account
+       $upn = (Get-MgContext).Account
         $Userid = (Get-MgUser -ConsistencyLevel eventual -Count userCount  -Search  UserPrincipalName:$((Get-MgContext).Account)).Id
         $MemberOf = (Get-MgUserMemberOf -UserId $Userid | Select-Object *).AdditionalProperties.displayName   
     
@@ -29,7 +28,5 @@ else {
         else {
         Write-Host "You have logged in with $((Get-MgContext).Account), Sorry you do not have sufficient Permission to Add/Remove Devices, Please check if you have Intune or Global Administrator permissions on your account"
         }
-
-
  }
  Connect
