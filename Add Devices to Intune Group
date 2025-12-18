@@ -1,5 +1,4 @@
-#==================================================  Add Device to The Group ======================================
-
+# This script is used to Add multiple Device to The Group.
    function Adddevice
    
    {
